@@ -1,0 +1,136 @@
+server:
+  port: 8080
+  shutdown: graceful
+spring:
+  profiles:
+    active: dev #默认为开发环境
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+      enabled: true
+#  config:
+#    import:
+#      - optional:nacos:XXXXXX.yml
+#      - optional:nacos:XXXXXX.yml
+#  application:
+#    name: w-boot-example
+#  kafka:
+#    consumer:
+#      group-id: XXXXX
+#      ##ensures the new consumer group gets the messages we sent
+#      auto-offset-reset: earliest
+  main: # Springboot 2.6 之后默认不允许循环依赖，需要手动开启
+    allow-circular-references: true
+    allow-bean-definition-overriding: true
+#  redis:
+#      database: 0
+#      host: 127.0.0.1
+#      password:
+#      port: 6379
+#    redisson:
+#      ## 注:默认序列化方式Kryo5Codec与spring statemachine依赖冲突,
+#       ##使用json-jackson替代。config后的“|”代表多行文本
+#      config: |
+#        codec: !<org.redisson.codec.JsonJacksonCodec> {}
+#        singleServerConfig:
+#          password: 123456
+#          address: "redis://redis:6379"
+#  flyway:
+#    enabled: false
+#    baseline-on-migrate: true
+#    clean-disabled: true
+#    locations:
+#      - classpath:db/migration/mysql
+  ##开启虚拟线程
+  threads:
+    virtual:
+      enabled: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/wboot?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC&useSSL=false&rewriteBatchedStatements=true
+    username: wboot
+    password: wboot
+    type: com.alibaba.druid.pool.DruidDataSource
+    druid:
+      #连接池最大连接数
+      max-active: 150
+      #获取连接的最大等待时间
+      max-wait: 60000
+      #连接池最小连接数
+      min-idle: 15
+      #连接池初始化大小
+      initial-size: 15
+      filters: stat,wall,slf4j
+      connection-properties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+      max-pool-prepared-statement-per-connection-size: 20
+      pool-prepared-statements: false
+      test-on-borrow: false
+      test-on-return: false
+      test-while-idle: true
+      validation-query: SELECT 1
+      min-evictable-idle-time-millis: 300000
+      time-between-eviction-runs-millis: 60000
+      #监控信息   localhost:${server.port}/druid/login.html
+      stat-view-servlet:
+        login-username: alexjiang
+        login-password: alexjiang
+        #允许哪个机器登录
+        allow:
+        #sql监控开关
+        enabled: true
+      #url监控
+      web-stat-filter:
+        enabled: true
+        #session监控
+        session-stat-enable: true
+      filter:
+        stat:
+          log-slow-sql: true
+          slow-sql-millis: 1000
+
+
+#  cloud:
+#    nacos:
+#      username: nacos
+#      password: nacos
+#      server-addr: nacos:8848
+
+mybatis-plus:
+  # xml扫描，多个目录用逗号或者分号分隔（告诉 Mapper 所对应的 XML 文件位置）
+  mapper-locations: classpath:xml/*Mapper.xml
+  typeAliasesPackage: com.naiteck.example.entity
+  # 以下配置均有默认值,可以不设置
+  global-config:
+    db-config:
+      #主键类型  auto:"数据库ID自增" 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+      id-type: auto
+      #字段策略 IGNORED:"忽略判断"  NOT_NULL:"非 NULL 判断")  NOT_EMPTY:"非空判断"
+      field-strategy: NOT_EMPTY
+      #数据库类型
+      db-type: MYSQL
+      logic-delete-field: flag  # 全局逻辑删除的实体字段名(since 3.3.0,配置后可以忽略不配置步骤2)
+      logic-delete-value: 0 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 1 # 逻辑未删除值(默认为 0)
+  configuration:
+    # 是否开启自动驼峰命名规则映射:从数据库列名到Java属性驼峰命名的类似映射
+    map-underscore-to-camel-case: true
+    # 如果查询结果中包含空值的列，则 MyBatis 在映射的时候，不会映射这个字段
+    call-setters-on-nulls: true
+    jdbc-type-for-null: 'null'
+    # 这个配置会将执行的sql打印出来，在开发或测试的时候可以用
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#feign:
+#  sentinel:
+#    ##开启sentinel对feign的支持
+#    enabled: false
+logging:
+  level:
+    root: info
+    com.naiteck.example.dao: trace
+    com.naiteck: info
